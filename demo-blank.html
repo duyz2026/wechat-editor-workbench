@@ -41,8 +41,8 @@ textarea#md { flex:1; width:100%; border:0; padding:14px; resize:none; font-fami
 .tipbox.ok { background:#f0fff5; border:1px solid #b7e4c7; color:#0a7d4b; }
 .tipbox b { color:#5c3f00; }
 .tipbox button { margin:6px 8px 0 0; font-size:12px; padding:5px 12px; }
-header a.home { font-size:13px; padding:6px 14px; border:1px solid #2563eb; background:#2563eb; border-radius:6px; text-decoration:none; color:#fff; margin-right:8px; font-weight:600; }
-header a.home:hover { background:#1d4ed8; border-color:#1d4ed8; color:#fff; text-decoration:none; }
+header a.home { font-size:13px; padding:6px 14px; border:1px solid #93c5fd; background:#dbeafe; border-radius:6px; text-decoration:none; color:#1e3a8a; margin-right:8px; font-weight:600; }
+header a.home:hover { background:#bfdbfe; border-color:#60a5fa; color:#1e3a8a; text-decoration:none; }
 #openBtn { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
 #openBtn:hover { background:#dbeafe; border-color:#93c5fd; }
 #saveBtn.off { opacity:.78; }
@@ -67,7 +67,7 @@ header a.home:hover { background:#1d4ed8; border-color:#1d4ed8; color:#fff; text
   <button id="copyBtn" onclick="copyNow()">📋 复制公众号正文</button>
   <button id="draftBtn" class="off" data-plat="wechat" data-ready="1" onclick="demoDraft()">📥 存草稿箱（需本机版）</button>
   <button id="saveBtn" class="off" onclick="saveBack()">💾 存回原稿</button>
-  <a class="home" href="index.html">← 返回工作台</a><button id="openBtn" onclick="pickMd()" title="打开你电脑上的一个 .md 文件（不会上传）">📂 打开 .md</button><input type="file" id="fileIn" accept=".md,.markdown,.txt,.text" style="display:none"><button id="tplBtn" onclick="insertTpl()">🧱 插入3栏</button>
+  <a class="home" href="index.html">返回工作台</a><button id="openBtn" onclick="pickMd()" title="打开你电脑上的一个 .md 文件（不会上传）">📂 打开 .md</button><input type="file" id="fileIn" accept=".md,.markdown,.txt,.text" style="display:none"><button id="tplBtn" onclick="insertTpl()">🧱 插入3栏</button>
 </header>
 <div id="tips"></div>
 <div class="bar" id="draftBar"></div>
