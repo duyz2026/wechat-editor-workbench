@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[演示] 用 Markdown 写公众号：一个页面，三步排版</title>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:#eee; color:#222; }
+header { padding:10px 14px; background:#fff; border-bottom:1px solid #e3e3e3; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+header h1 { font-size:15px; margin:0 10px 0 0; }
+button { font-size:13px; padding:6px 12px; border:1px solid #e3e3e3; background:#fff; border-radius:6px; cursor:pointer; }
+.themes button.active { background:#3a7afe; color:#fff; border-color:#3a7afe; }
+#copyBtn { background:#07c160; color:#fff; border-color:#07c160; font-weight:700; }
+#draftBtn { background:#3a7afe; color:#fff; border-color:#3a7afe; font-weight:700; }
+#draftBtn.on { box-shadow:0 0 0 2px #cfe0ff; }
+#draftBtn.off { opacity:.55; }
+.bar { display:none; padding:8px 14px; font-size:13px; line-height:1.75; border-bottom:1px solid #e3e3e3; }
+.bar.run { background:#eef4fb; color:#1565c0; }
+.bar.ok { background:#f0fff5; color:#07c160; }
+.bar.fail { background:#fff6f6; color:#c0392b; }
+.bar code { background:#fff; padding:1px 6px; border-radius:4px; font-size:12px; border:1px solid #e3e3e3; }
+.tip { font-size:12px; color:#c0392b; padding:8px 14px; background:#fff8f6; border-bottom:1px solid #f3d9d2; line-height:1.6; }
+.layout { display:flex; height:calc(100vh - 112px); }
+.pane { flex:1; display:flex; flex-direction:column; min-width:0; }
+.pane:first-child { border-right:1px solid #e3e3e3; }
+.pane h2 { font-size:13px; margin:0; padding:8px 12px; background:#fafafa; border-bottom:1px solid #e3e3e3; color:#555; }
+textarea#md { flex:1; width:100%; border:0; padding:14px; resize:none; font-family:Consolas,monospace; font-size:14px; line-height:1.7; outline:none; }
+.preview-wrap { flex:1; overflow:auto; background:#e9e9ed; padding:16px; }
+.phone { max-width:380px; margin:0 auto; background:#fff; border-radius:10px; padding:18px 16px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+.note { font-size:12px; color:#888; padding:6px 12px; }
+#saveBtn { background:#8a6d1f; color:#fff; border-color:#8a6d1f; font-weight:700; }
+#saveBtn.off { opacity:.55; }
+#saveBtn.dirty { box-shadow:0 0 0 2px #ffe6a8; }
+#tplBtn { background:#fff; color:#555; border:1px dashed #bbb; }
+.pathbar { font-size:12px; color:#666; padding:6px 14px; background:#fafafa; border-bottom:1px solid #e3e3e3; line-height:1.6; word-break:break-all; }
+.pathbar code { background:#fff; padding:1px 6px; border-radius:4px; font-size:11px; border:1px solid #e3e3e3; color:#444; }
+#tips { display:none; margin:0 0 10px; }
+.tipbox { padding:11px 14px; border-radius:8px; font-size:13px; line-height:1.75; }
+.tipbox.warn { background:#fff8e6; border:1px solid #f0d79a; color:#7a5a10; }
+.tipbox.ok { background:#f0fff5; border:1px solid #b7e4c7; color:#0a7d4b; }
+.tipbox b { color:#5c3f00; }
+.tipbox button { margin:6px 8px 0 0; font-size:12px; padding:5px 12px; }
+header a.home { font-size:13px; padding:6px 14px; border:1px solid #2563eb; background:#2563eb; border-radius:6px; text-decoration:none; color:#fff; margin-right:8px; font-weight:600; }
+header a.home:hover { background:#1d4ed8; border-color:#1d4ed8; color:#fff; text-decoration:none; }
+#openBtn { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+#openBtn:hover { background:#dbeafe; border-color:#93c5fd; }
+#saveBtn.off { opacity:.78; }
+#saveBtn:hover { filter:brightness(1.08); }
+#demoBanner { position:sticky; top:0; z-index:9999; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; padding:8px 14px; background:#1f3a8a; color:#fff; font-size:12.5px; line-height:1.5; text-align:center; }
+#demoBanner b { color:#fff; font-weight:700; }
+#demoBanner .sep { opacity:.45; }
+#demoBanner a { color:#cfe0ff; text-decoration:none; border-bottom:1px dashed #cfe0ff; }
+#demoBanner .pill { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32); border-radius:20px; padding:1px 9px; font-size:11.5px; }
+</style>
+</head>
+<body>
+<div id="demoBanner"><span class="pill">投稿演示版</span><span><b>示例内容，可以随便改</b></span><span class="sep">|</span><span>这是独立的投稿页面，与你电脑上的写作台<b>互不相通</b>，不会动到任何真实稿件</span><span class="sep">|</span><a href="index.html">返回说明</a></div>
+<header>
+  <h1>公众号工作台</h1>
+  <span class="themes">
+    <button data-t="elegant">雅致</button>
+    <button data-t="tech">科技蓝</button>
+    <button data-t="green">文艺绿</button>
+    <button data-t="dark">暗夜</button>
+  </span>
+  <button id="copyBtn" onclick="copyNow()">📋 复制公众号正文</button>
+  <button id="draftBtn" class="off" data-plat="wechat" data-ready="1" onclick="demoDraft()">📥 存草稿箱（需本机版）</button>
+  <button id="saveBtn" class="off" onclick="saveBack()">💾 存回原稿</button>
+  <a class="home" href="index.html">← 返回工作台</a><button id="openBtn" onclick="pickMd()" title="打开你电脑上的一个 .md 文件（不会上传）">📂 打开 .md</button><input type="file" id="fileIn" accept=".md,.markdown,.txt,.text" style="display:none"><button id="tplBtn" onclick="insertTpl()">🧱 插入3栏</button>
+</header>
+<div id="tips"></div>
+<div class="bar" id="draftBar"></div>
+<div class="tip">① 左边改文字 → ② 顶部挑主题（雅致/科技蓝/文艺绿/暗夜）→ ③ 点「📋 复制公众号正文」，去公众号后台 Ctrl+V 即可，样式一起带过去。改到一半关掉也不怕，内容自动存在你浏览器里。</div>
+<div class="tip" id="countTip" style="display:none;color:#07c160;background:#f0fff5;border-color:#b7e4c7;">字数统计：<span id="cnt">0</span> / 上限 500（贴图版短文标准）</div>
+<div class="pathbar" id="pathBar"></div>
+<div class="layout">
+  <div class="pane">
+    <h2>① 改文字（Markdown 源码）</h2>
+    <textarea id="md" spellcheck="false"># 用 Markdown 写公众号：一个页面，三步排版
+
+写公众号最劝退的从来不是写字，是排版。
+
+字早就写好了，在 Markdown 里，标题、引用、代码块、列表都规规矩矩。可一进公众号后台，就得重新来一遍：标题几号字、正文几号字、行距多少、引用左边那条竖线什么颜色、段间距留多少。一篇两千字的东西，光调这些半小时就没了。
+
+更麻烦的是调完不算完。下次写新的一篇，照着上次再调一遍，手感又不一样，等于每篇都是第一次。
+
+所以我把排版这件事单独拎出来，做成了一个页面：**左边写 Markdown，右边直接出公众号的排版效果，改完一键复制，去后台 Ctrl+V。**
+
+## 三步就用完
+
+不用注册，不用装东西，打开就能用。
+
+**第一步，左边改文字。**
+
+Markdown 源码直接编辑，标题、加粗、引用、代码块、有序无序列表、表格、分割线都认。已经写好的稿子，点「📂 打开 .md」直接读进来。
+
+**第二步，顶部挑主题。**
+
+四套排版：雅致、科技蓝、文艺绿、暗夜。同一篇稿子，切一下就知道哪套更配。手机上长什么样，右边预览区基本就是那个样子。
+
+**第三步，复制，去后台粘贴。**
+
+点「📋 复制公众号正文」，回公众号编辑器按 Ctrl+V。标题的粗细、引用的底色、代码块的灰底，会一起过去，不用再一格一格调。
+
+改到一半关掉页面也不怕，内容自动存在浏览器里，下次打开会问你要不要恢复。
+
+## 三个绕不开的细节
+
+这部分是给同样想自己做工具的人看的，普通使用者可以跳过。
+
+### 一、微信只认内联样式
+
+微信的编辑器会把 `&lt;style&gt;` 标签和 `class` 全部滤掉，只保留写在标签 `style=""` 属性里的东西。
+
+也就是说，本地渲染得再漂亮，只要样式是靠外部 CSS 给的，粘进去就打回原形：标题不加粗、引用没底色、代码块没有灰底，全散架。
+
+所以渲染的时候必须把每一条样式都内联进标签：
+
+```html
+&lt;h2 style="font-size:20px;font-weight:700;color:#1565c0;margin:1.5em 0 .7em;"&gt;
+```
+
+这一个改动，解决了九成的问题。
+
+### 二、别复制预览区，复制手写出来的 HTML
+
+第二个坑更隐蔽。
+
+最初的做法很自然：让用户在右侧预览区里，从标题拖到文末全选，然后 Ctrl+C。看起来没问题，粘进微信却弹出「内容结构检测 · 文字对齐异常」。
+
+原因是浏览器复制选中区域时，会把计算后的样式一起带走，其中有一项 `text-align: start`。微信不认这个值，判定为异常。
+
+解法是**不复制 DOM**：按下 Ctrl+C 的那一刻，直接把程序自己拼出来的干净 HTML 写进剪贴板，里面一个 `text-align` 都没有。从源头消除，而不是粘完再改。
+
+顺带一条：剪贴板要写 `text/html`，不能写 `text/plain`。写成纯文本，后台显示出来的是一堆 `&lt;section style=...&gt;` 的标签源码。
+
+### 三、本地图片一定会裂，这个绕不过
+
+Markdown 里写 `![](images/01.png)`，本地预览好好的。但微信只认自家图床里的图，本地相对路径粘过去必然是裂的。
+
+这一点没法取巧，只能承认：复制的时候，把所有本地图片统一换成一行红色占位提示「此处插入图片：01.png」，去后台对应位置用「图片」按钮手动补一张。
+
+不假装能自动带过去，比带过去之后满屏裂图要省事。
+
+## 它适合谁，不适合谁
+
+适合：常年更新公众号、有自己写稿习惯、每次都被排版耗掉半小时的人。尤其是稿子本来就用 Markdown 写的，打开就能贴，基本不用改。
+
+不太适合：需要复杂版式的人。多栏、卡片、带背景图的标题、花式分割线，这些它不做，硬塞进去反而会被微信过滤成四不像。
+
+还有一点要说清楚：这个在线演示版**没有接公众号后台**。页面上那个「📥 存公众号草稿箱」按钮，点了会告诉你为什么不行，不会假装成功。完整版跑在自己电脑上时，它才真的能把稿子直接送进草稿箱。
+
+## 最后
+
+写字的部分，还是得你自己来。
+
+排版的部分，可以不用再手工调了。</textarea>
+    <div class="note">改完直接去复制，无需下载。</div>
+  </div>
+  <div class="pane">
+    <h2>② 公众号效果预览（手机视图）</h2>
+    <div class="preview-wrap"><div class="phone" id="phone"></div></div>
+  </div>
+</div>
+<script>
+var IMG_BASE = "";
+var LABEL = { elegant:"雅致", tech:"科技蓝", green:"文艺绿", dark:"暗夜" };
+var STATE = { theme: "tech", mode: "article" };
+
+// ---- 4 主题内联样式（与 Python 转换器 THEME 对齐）----
+var TH = {
+  elegant: {
+    wrapper:"font-size:16px;color:#3f3f3f;line-height:1.75;letter-spacing:.5px;word-break:break-word;background:#ffffff;padding:8px 4px;",
+    h1:"font-size:22px;font-weight:700;color:#2c3e50;margin:1.6em 0 .8em;padding-left:12px;border-left:5px solid #2c3e50;",
+    h2:"font-size:20px;font-weight:700;color:#2c3e50;margin:1.5em 0 .7em;padding-left:10px;border-left:4px solid #2c3e50;",
+    h3:"font-size:18px;font-weight:700;color:#2c3e50;margin:1.3em 0 .6em;",
+    h4:"font-size:16px;font-weight:700;color:#2c3e50;margin:1.2em 0 .5em;",
+    p:"margin:1.2em 0;font-size:16px;line-height:1.75;",
+    pre:"background:#f6f8fa;color:#24292e;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:14px;line-height:1.6;font-family:Consolas,Menlo,monospace;",
+    quote:"margin:1.2em 0;padding:10px 16px;background:#f8f9fa;border-left:4px solid #2c3e50;color:#6a737d;",
+    hr:"border:none;border-top:1px solid #eaeaea;margin:1.6em 0;",
+    ul:"margin:1em 0;padding-left:1.6em;", ol:"margin:1em 0;padding-left:1.6em;", li:"margin:.4em 0;line-height:1.75;",
+    table:"border-collapse:collapse;width:100%;margin:1.2em 0;font-size:14px;",
+    th:"border:1px solid #eaeaea;padding:8px 10px;text-align:left;background:#f6f8fa;font-weight:700;",
+    td:"border:1px solid #eaeaea;padding:8px 10px;text-align:left;",
+    a:"color:#576b95;text-decoration:none;",
+    img:"display:block;max-width:100%;margin:10px auto;border-radius:4px;"
+  },
+  tech: {
+    wrapper:"font-size:16px;color:#1f2329;line-height:1.75;letter-spacing:.5px;word-break:break-word;background:#ffffff;padding:8px 4px;",
+    h1:"font-size:22px;font-weight:700;color:#1565c0;margin:1.6em 0 .8em;padding-left:12px;border-left:5px solid #1565c0;",
+    h2:"font-size:20px;font-weight:700;color:#1565c0;margin:1.5em 0 .7em;padding-left:10px;border-left:4px solid #1565c0;",
+    h3:"font-size:18px;font-weight:700;color:#1565c0;margin:1.3em 0 .6em;",
+    h4:"font-size:16px;font-weight:700;color:#1565c0;margin:1.2em 0 .5em;",
+    p:"margin:1.2em 0;font-size:16px;line-height:1.75;",
+    pre:"background:#eef4fb;color:#24292e;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:14px;line-height:1.6;font-family:Consolas,Menlo,monospace;",
+    quote:"margin:1.2em 0;padding:10px 16px;background:#eef4fb;border-left:4px solid #1565c0;color:#445;",
+    hr:"border:none;border-top:1px solid #e3e3e3;margin:1.6em 0;",
+    ul:"margin:1em 0;padding-left:1.6em;", ol:"margin:1em 0;padding-left:1.6em;", li:"margin:.4em 0;line-height:1.75;",
+    table:"border-collapse:collapse;width:100%;margin:1.2em 0;font-size:14px;",
+    th:"border:1px solid #e3e3e3;padding:8px 10px;text-align:left;background:#eef4fb;font-weight:700;",
+    td:"border:1px solid #e3e3e3;padding:8px 10px;text-align:left;",
+    a:"color:#1565c0;text-decoration:none;",
+    img:"display:block;max-width:100%;margin:10px auto;border-radius:4px;"
+  },
+  green: {
+    wrapper:"font-size:16px;color:#3f3f3f;line-height:1.75;letter-spacing:.5px;word-break:break-word;background:#ffffff;padding:8px 4px;",
+    h1:"font-size:22px;font-weight:700;color:#2e7d32;margin:1.6em 0 .8em;padding-left:12px;border-left:5px solid #2e7d32;",
+    h2:"font-size:20px;font-weight:700;color:#2e7d32;margin:1.5em 0 .7em;padding-left:10px;border-left:4px solid #2e7d32;",
+    h3:"font-size:18px;font-weight:700;color:#2e7d32;margin:1.3em 0 .6em;",
+    h4:"font-size:16px;font-weight:700;color:#2e7d32;margin:1.2em 0 .5em;",
+    p:"margin:1.2em 0;font-size:16px;line-height:1.75;",
+    pre:"background:#f1f8f2;color:#24292e;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:14px;line-height:1.6;font-family:Consolas,Menlo,monospace;",
+    quote:"margin:1.2em 0;padding:10px 16px;background:#f1f8f2;border-left:4px solid #2e7d32;color:#3a4a3a;",
+    hr:"border:none;border-top:1px solid #e3e3e3;margin:1.6em 0;",
+    ul:"margin:1em 0;padding-left:1.6em;", ol:"margin:1em 0;padding-left:1.6em;", li:"margin:.4em 0;line-height:1.75;",
+    table:"border-collapse:collapse;width:100%;margin:1.2em 0;font-size:14px;",
+    th:"border:1px solid #e3e3e3;padding:8px 10px;text-align:left;background:#f1f8f2;font-weight:700;",
+    td:"border:1px solid #e3e3e3;padding:8px 10px;text-align:left;",
+    a:"color:#2e7d32;text-decoration:none;",
+    img:"display:block;max-width:100%;margin:10px auto;border-radius:4px;"
+  },
+  dark: {
+    wrapper:"font-size:16px;color:#d0d0d0;line-height:1.75;letter-spacing:.5px;word-break:break-word;background:#15202b;padding:8px 4px;",
+    h1:"font-size:22px;font-weight:700;color:#ffffff;margin:1.6em 0 .8em;padding-left:12px;border-left:5px solid #bb86fc;",
+    h2:"font-size:20px;font-weight:700;color:#ffffff;margin:1.5em 0 .7em;padding-left:10px;border-left:4px solid #bb86fc;",
+    h3:"font-size:18px;font-weight:700;color:#ffffff;margin:1.3em 0 .6em;",
+    h4:"font-size:16px;font-weight:700;color:#ffffff;margin:1.2em 0 .5em;",
+    p:"margin:1.2em 0;font-size:16px;line-height:1.75;",
+    pre:"background:#1e1e1e;color:#e6e6e6;padding:14px 16px;border-radius:6px;overflow-x:auto;font-size:14px;line-height:1.6;font-family:Consolas,Menlo,monospace;",
+    quote:"margin:1.2em 0;padding:10px 16px;background:#2a2a2a;border-left:4px solid #bb86fc;color:#b8c0cc;",
+    hr:"border:none;border-top:1px solid #444;margin:1.6em 0;",
+    ul:"margin:1em 0;padding-left:1.6em;", ol:"margin:1em 0;padding-left:1.6em;", li:"margin:.4em 0;line-height:1.75;",
+    table:"border-collapse:collapse;width:100%;margin:1.2em 0;font-size:14px;",
+    th:"border:1px solid #444;padding:8px 10px;text-align:left;background:#2a2a2a;font-weight:700;",
+    td:"border:1px solid #444;padding:8px 10px;text-align:left;",
+    a:"color:#82aaff;text-decoration:none;",
+    img:"display:block;max-width:100%;margin:10px auto;border-radius:4px;"
+  }
+};
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function attrEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function resolveImg(src){
+  if(src.indexOf('://')>=0) return src;
+  if(src.indexOf('../images/')===0) return IMG_BASE + src.substring('../images/'.length);
+  if(src.indexOf('images/')===0) return IMG_BASE + src.substring('images/'.length);
+  return src;
+}
+function imgPlaceholder(name){
+  return '<p style="color:#c0392b;border:1px dashed #c0392b;border-radius:6px;padding:10px;margin:12px 0;">[📷 此处插入图片：'+name+' — 请在公众号后台用「图片」按钮上传]</p>';
+}
+function inline(s, t, forCopy){
+  // 安全：裸尖括号转义，防止 Markdown 里的 HTML 被当标签执行
+  s = s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // 图片
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(m,alt,src){
+    if(/^(javascript|data|vbscript|file):/i.test(src)) return esc(src);
+    if(/^https?:\/\//.test(src)) return '<img alt="'+alt+'" src="'+attrEsc(src)+'" style="'+t.img+'">';
+    if(forCopy) return imgPlaceholder(src.split('/').pop());
+    return '<img alt="'+alt+'" src="'+attrEsc(resolveImg(src))+'" style="'+t.img+'">';
+  });
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m,txt,url){
+    var u = String(url).trim();
+    if(/^(javascript|data|vbscript|file):/i.test(u)) return txt;
+    return '<a href="' + attrEsc(u) + '" style="' + t.a + '">' + txt + '</a>';
+  });
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+  s = s.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+  s = s.replace(/`([^`]+)`/g, function(m,c){ return '<code style="background:#f5f5f5;padding:2px 6px;border-radius:4px;font-family:Consolas,monospace;font-size:14px;color:#c7254e;">' + c + '</code>'; });
+  s = s.replace(/~~([^~]+)~~/g, '<span style="text-decoration:line-through;">$1</span>');
+  return s;
+}
+function md2html(md, theme, forCopy){
+  var t = TH[theme] || TH.elegant;
+  var lines = md.split('\n'), out = [], i = 0;
+  while(i < lines.length){
+    var ln = lines[i];
+    if(ln.trim()===''){ i++; continue; }
+    if(ln.trim().indexOf('```')===0){
+      var buf=[]; i++;
+      while(i<lines.length && lines[i].trim().indexOf('```')!==0){ buf.push(esc(lines[i])); i++; }
+      i++; out.push('<pre style="'+t.pre+'"><code style="background:none;padding:0;color:inherit;font-family:inherit;">'+buf.join('\n')+'</code></pre>'); continue;
+    }
+    var hm = ln.match(/^(#{1,6})\s+(.*)$/);
+    if(hm){ var lv=hm[1].length; out.push('<h'+lv+' style="'+t['h'+lv]+'">'+inline(hm[2],t,forCopy)+'</h'+lv+'>'); i++; continue; }
+    if(/^(\s*[-*_]){3,}\s*$/.test(ln)){ out.push('<hr style="'+t.hr+'">'); i++; continue; }
+    if(ln.lstrip){}
+    if(/^\s*>/.test(ln)){
+      var q=[]; while(i<lines.length && /^\s*>/.test(lines[i])){ q.push(inline(lines[i].replace(/^\s*>\s?/,''),t,forCopy)); i++; }
+      out.push('<blockquote style="'+t.quote+'">'+q.join('<br>')+'</blockquote>'); continue;
+    }
+    if(/^\s*\|/.test(ln) && i+1<lines.length && /^\s*\|?[\s:\-\|]+\|?\s*$/.test(lines[i+1])){
+      var hdr=[].map.call(ln.trim().replace(/^\||\|$/g,'').split('|'), function(c){return c.trim();});
+      i+=2; var rows=[];
+      while(i<lines.length && /^\s*\|/.test(lines[i]) && lines[i].trim()){
+        rows.push([].map.call(lines[i].trim().replace(/^\||\|$/g,'').split('|'), function(c){return c.trim();})); i++;
+      }
+      var thh=''; hdr.forEach(function(c){ thh+='<th style="'+t.th+'">'+inline(c,t,forCopy)+'</th>'; });
+      var tb=''; rows.forEach(function(r){ tb+='<tr>'; r.forEach(function(c){ tb+='<td style="'+t.td+'">'+inline(c,t,forCopy)+'</td>'; }); tb+='</tr>'; });
+      out.push('<table style="'+t.table+'"><thead><tr>'+thh+'</tr></thead><tbody>'+tb+'</tbody></table>'); continue;
+    }
+    var ol=ln.match(/^\s*\d+\.\s+(.*)$/), ul=ln.match(/^\s*[-*+]\s+(.*)$/);
+    if(ol||ul){
+      var tag = ol?'ol':'ul', items=[];
+      while(i<lines.length && ((ol&&/^\s*\d+\.\s+/.test(lines[i]))||(ul&&/^\s*[-*+]\s+/.test(lines[i])))){
+        var c = ol?lines[i].match(/^\s*\d+\.\s+(.*)$/)[1]:lines[i].match(/^\s*[-*+]\s+(.*)$/)[1];
+        items.push('<li style="'+t.li+'">'+inline(c,t,forCopy)+'</li>'); i++;
+      }
+      out.push('<'+tag+' style="'+t[tag]+'">'+items.join('')+'</'+tag+'>'); continue;
+    }
+    var para=[ln]; i++;
+    while(i<lines.length && lines[i].trim() && !/^\s*>/.test(lines[i]) && !/^#{1,6}\s/.test(lines[i]) && !/^\s*[-*+]\s+/.test(lines[i]) && !/^\s*\d+\.\s+/.test(lines[i]) && lines[i].trim().indexOf('```')!==0 && !/^(\s*[-*_]){3,}\s*$/.test(lines[i])){
+      para.push(lines[i]); i++;
+    }
+    out.push('<p style="'+t.p+'">'+inline(para.join(' '),t,forCopy)+'</p>');
+  }
+  return '<section style="'+t.wrapper+'">\n'+out.join('\n')+'\n</section>';
+}
+
+function render(){
+  var md = document.getElementById('md').value;
+  document.getElementById('phone').innerHTML = md2html(md, STATE.theme, false);
+}
+function setTheme(th){
+  STATE.theme = th;
+  document.querySelectorAll('.themes button').forEach(function(b){ b.classList.toggle('active', b.dataset.t===th); });
+  render();
+}
+// ---- 插入「3栏对比」模板（左中右布局，匹配老板之前的贴图风格）----
+function insertTpl(){
+  var ta = document.getElementById('md');
+  if(!ta) return;
+  var tpl = '\n| 左栏 | 中栏 | 右栏 |\n|---|---|---|\n| 写这里 | 写这里 | 写这里 |\n';
+  var s = ta.selectionStart, e = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + tpl + ta.value.slice(e);
+  ta.selectionStart = ta.selectionEnd = s + tpl.length;
+  ta.focus();
+  ta.dispatchEvent(new Event('input'));     // 触发预览刷新 + 自动暂存
+}
+// 复制：直接把手写干净内联 HTML 写进剪贴板（不复制 DOM，零 text-align）
+function copyNow(){
+  var th = STATE.theme;
+  var md = document.getElementById('md').value;
+  var frag = md2html(md, th, true);   // forCopy=true -> 本地图占位提示
+  var plain = document.getElementById('phone').innerText;
+  function onCopy(e){
+    e.preventDefault();
+    e.clipboardData.setData('text/html', frag);
+    e.clipboardData.setData('text/plain', plain);
+  }
+  document.addEventListener('copy', onCopy, true);
+  var ok=false; try { ok = document.execCommand('copy'); } catch(e){}
+  document.removeEventListener('copy', onCopy, true);
+  if(ok){ alert('已复制「'+LABEL[th]+'」主题正文（富文本，零 text-align）。\n去公众号后台编辑器 Ctrl+V 粘贴即可。'); }
+  else { alert('自动复制失败：请在右侧预览区用鼠标从标题拖到文末全选，再按 Ctrl+C。'); }
+}
+// ---- 落稿平台注册表（多平台可扩展：目前只有公众号）----
+// 每个平台的「存草稿箱」按钮都走本机「存稿桥服务」（draft_bridge.py）。
+//   key=wechat → POST /draft（老服务兼容）；其它平台 → POST /draft-<key>（桥服务需同步加路由）
+var PLATFORMS = [{"key": "wechat", "name": "公众号", "target": "公众号后台草稿箱", "where": "内容与互动 → 草稿箱"}];
+function platIndex(key){
+  for(var i=0;i<PLATFORMS.length;i++){ if(PLATFORMS[i].key===key) return i; }
+  return 0;
+}
+function platName(key){ return PLATFORMS[platIndex(key)].name; }
+function platTarget(key){ return PLATFORMS[platIndex(key)].target; }
+function platWhere(key){ return PLATFORMS[platIndex(key)].where; }
+function platRoute(key){ return key === 'wechat' ? '/draft' : ('/draft-' + key); }
+var BRIDGE = "http://127.0.0.1:8765";
+var PAGE_TITLE = "用 Markdown 写公众号：一个页面，三步排版";
+var BAT_PATH = "";
+var SRC_PATH = "";          // 原稿 .md 的绝对路径（「存回原稿」按钮用）
+var LS_KEY = "wbk::" + (SRC_PATH || PAGE_TITLE);
+var _pollN = 0;
+var _lsTimer = null;
+var _dirty = false;
+var _initMd = "";
+
+// ---- 提示条 ----
+function setTips(cls, html){
+  var t = document.getElementById('tips');
+  if(!cls){ t.style.display = 'none'; t.innerHTML = ''; return; }
+  t.style.display = 'block';
+  t.innerHTML = '<div class="tipbox ' + cls + '">' + html + '</div>';
+}
+
+// ---- 自动暂存（localStorage）：只存在你自己浏览器里，不是文件 ----
+function markDirty(){
+  var now = document.getElementById('md').value;
+  _dirty = (now !== _initMd);
+  var b = document.getElementById('saveBtn');
+  if(b) b.className = _dirty ? 'dirty' : 'off';
+  if(_lsTimer) clearTimeout(_lsTimer);
+  _lsTimer = setTimeout(lsSave, 1200);
+}
+function lsSave(){
+  try{
+    var now = document.getElementById('md').value;
+    if(now === _initMd){                       // 改回原样 → 清掉暂存
+      localStorage.removeItem(LS_KEY);
+      return;
+    }
+    localStorage.setItem(LS_KEY, JSON.stringify({md: now, ts: Date.now()}));
+  }catch(e){}
+}
+function lsRead(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(!raw) return null;
+    var o = JSON.parse(raw);
+    return (o && typeof o.md === 'string' && o.md !== _initMd) ? o : null;
+  }catch(e){ return null; }
+}
+function lsClear(){ try{ localStorage.removeItem(LS_KEY); }catch(e){} }
+
+// 打开页面时：有未保存的暂存 → 问要不要恢复
+function checkRestore(){
+  var o = lsRead();
+  if(!o) return;
+  var when = new Date(o.ts || Date.now());
+  var pad = function(n){ return (n<10?'0':'') + n; };
+  var stamp = pad(when.getMonth()+1) + '-' + pad(when.getDate()) + ' '
+            + pad(when.getHours()) + ':' + pad(when.getMinutes());
+  setTips('warn',
+    '⚠️ <b>检测到上次没保存的改动</b>（' + stamp + ' 自动暂存，存在你本机浏览器里）。<br>'
+    + '<button onclick="doRestore()">恢复这些改动</button>'
+    + '<button onclick="doDiscard()">丢弃，用原稿</button>');
+}
+function doRestore(){
+  var o = lsRead();
+  if(!o){ setTips(null); return; }
+  var ta = document.getElementById('md');
+  ta.value = o.md;
+  ta.dispatchEvent(new Event('input'));
+  setTips('ok', '✅ 已恢复上次未保存的改动。要固化进原稿，点「💾 存回原稿」。');
+}
+function doDiscard(){
+  lsClear();
+  setTips('ok', '已丢弃暂存，用的是原稿内容。');
+}
+
+// ---- 存回原稿：先备份旧稿、再覆盖原稿（都交给本地服务做）----
+
+function fillPathBar(){
+  var pb = document.getElementById('pathBar');
+  if(!pb || typeof SRC_PATH === 'undefined' || !SRC_PATH) return;
+  var root = (typeof BAT_PATH !== 'undefined' && BAT_PATH)
+    ? BAT_PATH.replace(/[\\/][^\\/]+$/, '') : '';
+  pb.innerHTML = '📄 源稿：<code>' + SRC_PATH + '</code> ｜ 📥 存草稿落到：<code>'
+    + root + '\\_draft_queue</code> 下，文件名＝时间戳-标题.md';
+}
+
+function saveBack(){
+  var md = document.getElementById('md').value;
+  if(!md.replace(/\s+/g,'')){ alert('内容是空的，先写点东西再存。'); return; }
+  if(!SRC_PATH){
+    alert('这个页面没带原稿路径（老页面会这样）。\n请关掉重开一次页面，或直接去改 .md 文件。');
+    return;
+  }
+  var btn = document.getElementById('saveBtn');
+  if(!_dirty && !confirm('内容和原稿一样，还是要覆盖一次吗？')) return;
+  btn.disabled = true;
+  setTips(null);
+  setBar('run','⏳ 正在存回原稿（会先把当前原稿备份到「旧稿」文件夹）…');
+  demoNoNet(BRIDGE + '/saveback', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ src: SRC_PATH, md: md, title: draftTitle() })
+    })
+    .then(function(r){ return r.json().catch(function(){ return {}; }); })
+    .then(function(j){
+      btn.disabled = false;
+      if(!j.ok){
+        setBar('fail','❌ 没存成：' + (j.msg || '未知原因'));
+        return;
+      }
+      _initMd = md; _dirty = false; btn.className = 'off';
+      lsClear();
+      if(j.same){
+        setBar('ok','✅ 编辑框内容和原稿本来就一致，没做任何改动。');
+        return;
+      }
+      setBar('ok','✅ 已存回原稿：<br><code>' + j.src + '</code><br>旧稿备份：<br><code>' + j.backup + '</code><br>（想回到旧版，把备份文件复制回原位置即可）');
+    })
+    .catch(function(){
+      btn.disabled = false;
+      setBar('fail','❌ 没连上本地存稿服务。双击运行这个文件再试一次——<br><br>在线演示版没有本机存稿服务。不想开服务也行：点「📋 复制公众号正文」，自己粘回 .md 文件。');
+    });
+}
+
+function setBar(cls, html){
+  var b = document.getElementById('draftBar');
+  b.className = 'bar ' + cls;
+  b.style.display = 'block';
+  b.innerHTML = html;
+}
+function draftTitle(){
+  var md = document.getElementById('md').value;
+  var m = md.match(/^#\s+(.+)$/m);
+  return (m ? m[1] : PAGE_TITLE).replace(/\s+$/, '');
+}
+var _curDraftKey = 'wechat';                 // 当前点的哪个平台的「存草稿箱」
+var _curDraftBtn = 'draftBtn';
+function saveDraft(key, btnId){
+  key = key || 'wechat';
+  btnId = btnId || ('draftBtn_' + key);
+  _curDraftKey = key; _curDraftBtn = btnId;
+  var PNAME = platName(key);
+  var md = document.getElementById('md').value;
+  if(!md.replace(/\s+/g,'')){ alert('内容是空的，先写点东西再存。'); return; }
+  var btn = document.getElementById(btnId);
+  btn.disabled = true;
+  setBar('run','⏳ 正在连接本地存稿服务…');
+  demoNoNet(BRIDGE + '/ping?t=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(!j.ok) throw new Error('ping');
+      setBar('run','⏳ 已连上。正在打开' + PNAME + '后台、注入标题与正文…（约 1 分钟，会弹出浏览器窗口，别关它）');
+      return demoNoNet(BRIDGE + platRoute(key), {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ title: draftTitle(), md: md })
+      });
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(!j.id) throw new Error(j.msg || 'no-id');
+      _pollN = 0;
+      pollDraft(j.id);
+    })
+    .catch(function(){
+      btn.disabled = false;
+      setBar('fail','❌ 没连上本地存稿服务（它现在没在跑）。<br>解决办法：双击运行下面这个文件，再回来点一次「📥 存' + PNAME + '草稿箱」——<br><br>在线演示版没有本机存稿服务。不想开服务也行：点「📋 复制公众号正文」，去后台 Ctrl+V 手动粘。');
+    });
+}
+function pollDraft(id){
+  if(_pollN++ > 80){
+    document.getElementById(_curDraftBtn).disabled = false;
+    setBar('fail','❌ 等太久了，看一眼浏览器窗口是不是卡住了。');
+    return;
+  }
+  demoNoNet(BRIDGE + '/status?id=' + encodeURIComponent(id) + '&t=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(j.state === 'running'){
+        setBar('run','⏳ 进行中：' + (j.step || '处理中') + ' …');
+        setTimeout(function(){ pollDraft(id); }, 3000);
+        return;
+      }
+      document.getElementById(_curDraftBtn).disabled = false;
+      if(j.state === 'ok'){
+        setBar('ok','✅ 已存进' + platTarget(_curDraftKey) + '！去后台「' + platWhere(_curDraftKey) + '」就能看到（标题：' + draftTitle() + '）。');
+      } else {
+        setBar('fail','❌ 存' + platName(_curDraftKey) + '草稿失败：' + (j.msg || '未知原因'));
+      }
+    })
+    .catch(function(){
+      document.getElementById(_curDraftBtn).disabled = false;
+      setBar('fail','❌ 拿不到进度，存稿服务可能被关掉了。');
+    });
+}
+window.onload = function(){
+  document.querySelectorAll('.themes button').forEach(function(b){ b.onclick=function(){ setTheme(b.dataset.t); }; });
+  var ta = document.getElementById('md');
+  _initMd = ta.value;
+  ta.addEventListener('input', render);
+  ta.addEventListener('input', markDirty);          // 自动暂存 + 标脏
+  setTheme(STATE.theme);                           // 首次渲染（别删）
+  checkRestore();
+  fillPathBar();                                  // 有未保存的暂存 → 提示恢复
+  // 探测本地存稿服务：在跑→「存×草稿箱」按钮点亮；没跑→置灰并在悬停时说明
+  var dbs = document.querySelectorAll('[data-plat]');
+  var sb = document.getElementById('saveBtn');
+  demoNoNet(BRIDGE + '/ping?t=' + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      dbs.forEach(function(b){
+        if(b.dataset.ready === '0'){                 // 预留的平台位：不参与探测
+          b.className = 'off';
+          b.title = '这个平台还没接入存稿服务（预留位）';
+          return;
+        }
+        b.className = j.ok ? 'on' : 'off';
+        if(!j.ok) b.title = '在线演示版未接本机存稿服务（完整版装在本机时可用）';
+      });
+      sb.className = j.ok ? (_dirty ? 'dirty' : 'off') : 'off';
+      if(j.ok && !j.saveback){                       // 老服务的兜底提示
+        sb.className = 'off';
+        sb.title = '在线演示版未接本机存稿服务';
+      }
+    })
+    .catch(function(){
+      dbs.forEach(function(b){
+        b.className = 'off';
+        b.title = '在线演示版未接本机存稿服务（完整版装在本机时可用）';
+      });
+      sb.className = 'off';
+      sb.title = '在线演示版未接本机存稿服务（完整版装在本机时可用）';
+    });
+};
+
+// ===== 在线演示版补丁：本机能力降级为说明，新增纯前端导入/导出 =====
+
+// 【安全】演示版彻底断网：所有原 fetch 调用点已改名到这个桩，绝不发出任何请求。
+//   （原调用点指向 http://127.0.0.1:8765，在别人电脑上只会留下一串失败请求。）
+function demoNoNet(){ return Promise.reject(new Error('demo: network disabled')); }
+
+// 【安全】覆盖原 onload：不再自动探测本机存稿服务，初始化只做本地渲染。
+window.onload = function(){
+  var ta = document.getElementById('md');
+  _initMd = ta.value;
+  ta.addEventListener('input', render);
+  ta.addEventListener('input', markDirty);
+  setTheme(STATE.theme);          // 首次渲染
+  checkRestore();                 // 本地暂存恢复（localStorage，不出浏览器）
+  fillPathBar();
+  var d = document.getElementById('draftBtn');
+  if(d){ d.className = 'off'; d.title = '在线演示版未接本机存稿服务（完整版装在本机时可用）'; }
+  var sb = document.getElementById('saveBtn'); if(sb) sb.style.display = '';
+  enableSaveBack();
+};
+
+function demoDraft(){
+  // 注意：这是「说明」不是「报错」，用蓝色信息条，不用红色失败条
+  setBar('run',
+    '<b>这个按钮需要在你自己的电脑上才能用。</b><br>'
+    + '它的作用是把稿子直接送进<b>你本人的</b>公众号后台草稿箱，所以必须用你自己的公众号登录态——'
+    + '而每个人登录的是自己的号，网页版没法替任何人保存。<br>'
+    + '<b>在线演示版替代方案：</b>点「📋 复制公众号正文」，到自己后台的编辑器里 Ctrl+V，效果一样（样式、引用、代码块都带过去）。<br>'
+    + '<b>拿到离线版之后：</b>在自己电脑上启动一次本地存稿服务（用你的公众号扫码登录），这个按钮就能直接存草稿箱。');
+}
+// ===== 打开本地 .md =====
+// 优先用文件系统选择器：这样能拿到文件句柄，改完「存回原稿」可以原地覆盖同一个文件。
+// 不支持的浏览器降级到 <input type="file">（只能读，存回时另存为）。
+var _srcHandle = null;
+
+window.pickMd = function(){
+  if(window.showOpenFilePicker){
+    window.showOpenFilePicker({
+      multiple: false,
+      types: [{
+        description: 'Markdown / 文本',
+        accept: { 'text/markdown': ['.md', '.markdown'], 'text/plain': ['.txt', '.text'] }
+      }]
+    }).then(function(hs){
+      var h = hs[0];
+      return h.getFile().then(function(f){
+        return f.text().then(function(txt){ loadIntoEditor(txt, f.name, h); });
+      });
+    }).catch(function(e){
+      if(e && e.name === 'AbortError') return;      // 用户自己取消，不打扰
+      var fi = document.getElementById('fileIn');
+      if(fi) fi.click();                            // 其他原因 → 降级
+    });
+    return;
+  }
+  var f = document.getElementById('fileIn');
+  if(f) f.click();
+};
+
+function loadIntoEditor(txt, name, handle){
+  var ta = document.getElementById('md');
+  ta.value = String(txt || '');
+  _initMd = ta.value; _dirty = false;
+  _srcHandle = handle || null;
+  var sb = document.getElementById('saveBtn');
+  if(sb){ sb.className = 'off'; sb.disabled = false; }
+  ta.dispatchEvent(new Event('input'));
+  setTips('ok', '已打开：<b>' + htmlEsc(name) + '</b>　'
+    + (_srcHandle ? '改完点「💾 存回原稿」会直接覆盖这个文件。' : '这个浏览器不支持原地覆盖，存回时会让你选保存位置。')
+    + '（全程只在你本机读写，不上传）');
+}
+
+function dlMd(){
+  var md = document.getElementById('md').value;
+  if(!md.replace(/\s+/g,'')){ alert('还没有内容，写点东西再保存。'); return; }
+  var name = (draftTitle() || '未命名').replace(/[\\/:*?"<>|]/g, '_');
+  var blob = new Blob([md], {type:'text/markdown;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name + '.md';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+}
+
+(function(){
+  var fi = document.getElementById('fileIn');
+  if(!fi) return;
+  fi.addEventListener('change', function(e){
+    var f = e.target.files && e.target.files[0];
+    if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){ loadIntoEditor(r.result, f.name, null); };
+    r.readAsText(f, 'utf-8');
+    e.target.value = '';
+  });
+})();
+function htmlEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== 存回原稿（重写原版实现）=====
+// 原版靠本机 8765 服务写文件；在线版改用浏览器文件系统权限直接写回本地，
+// 全程零网络请求。① 打开过文件 → 原地覆盖；② 没打开过 → 弹另存为（这就是「存到草稿」）；
+// ③ 浏览器不支持 → 自动降级为下载 .md。
+function enableSaveBack(){
+  var b = document.getElementById('saveBtn');
+  if(!b) return;
+  b.disabled = false;
+  b.className = 'off';
+  b.style.display = '';
+  b.title = '把当前内容存回你电脑上的 .md 文件（纯本地读写，不上传）';
+}
+
+window.saveBack = function(){
+  var md = document.getElementById('md').value;
+  if(!md.replace(/\s+/g,'')){ alert('内容是空的，先写点东西再存。'); return; }
+
+  var btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  if(typeof setTips === 'function') setTips(null);
+
+  function done(msg, cls){
+    _initMd = md; _dirty = false;
+    btn.className = 'off'; btn.disabled = false;
+    if(typeof lsClear === 'function') lsClear();
+    setBar(cls || 'ok', msg);
+  }
+
+  // ① 有原文件句柄 → 直接覆盖
+  if(_srcHandle){
+    (async function(){
+      var ok = true;
+      try{
+        if(_srcHandle.queryPermission){
+          var p = await _srcHandle.queryPermission({mode:'readwrite'});
+          if(p !== 'granted' && _srcHandle.requestPermission){
+            p = await _srcHandle.requestPermission({mode:'readwrite'});
+          }
+          if(p !== 'granted') ok = false;
+        }
+        if(ok){
+          var w = await _srcHandle.createWritable();
+          await w.write(md);
+          await w.close();
+          done('✅ 已存回原稿：<b>' + htmlEsc(_srcHandle.name) + '</b><br>'
+             + '文件就在你打开它时的那个位置，旧内容已被替换（想留旧版，请先在电脑上复制一份备份）。');
+          return;
+        }
+      }catch(e){ /* 落到下面另存为 */ }
+      fallback();
+    })();
+    return;
+  }
+  fallback();
+
+  // ② 另存为（第一次保存，或没有原文件句柄）
+  async function fallback(){
+    if(window.showSaveFilePicker){
+      try{
+        var nm = (draftTitle() || '未命名').replace(/[\\/:*?"<>|]/g, '_') + '.md';
+        var h = await window.showSaveFilePicker({
+          suggestedName: nm,
+          types: [{ description: 'Markdown 文件', accept: { 'text/markdown': ['.md'] } }]
+        });
+        var w2 = await h.createWritable();
+        await w2.write(md);
+        await w2.close();
+        _srcHandle = h;                       // 记住它，下次点这个按钮直接覆盖
+        done('✅ 已保存：<b>' + htmlEsc(h.name) + '</b><br>'
+           + '下次再点「💾 存回原稿」会直接存回这个文件，不再问你。');
+        return;
+      }catch(e){
+        btn.disabled = false;
+        if(e && e.name === 'AbortError') return;   // 用户取消选择，不提示
+      }
+    }
+    // ③ 兜底：下载
+    btn.disabled = false;
+    dlMd();
+    setBar('run', '这个浏览器不支持直接写文件，已改成下载 .md —— 把它覆盖到你的原稿上就行。');
+  }
+};
+
+</script>
+<script>
+// ===== 分享链接鉴权透传 =====
+// 发布平台要求 URL 携带 ?sharecode=xxx 才允许访问子页面（否则 403「链接不完整」），
+// 而 HTML 里的相对链接不会自动继承 query 参数，点一下内页就 403。
+// 这里在页面加载后，把当前的 sharecode 补到所有站内链接上。
+(function () {
+  var m = (location.search || "").match(/[?&]sharecode=([^&]+)/);
+  var SC = m ? decodeURIComponent(m[1]) : "";
+  if (!SC) return;
+
+  function withCode(href) {
+    if (!href) return href;
+    if (/^(https?:|mailto:|javascript:|tel:|data:|#)/i.test(href)) return href;
+    if (/[?&]sharecode=/i.test(href)) return href;
+    return href + (href.indexOf("?") >= 0 ? "&" : "?") + "sharecode=" + encodeURIComponent(SC);
+  }
+
+  function fix() {
+    var as = document.getElementsByTagName("a");
+    for (var i = 0; i < as.length; i++) {
+      var a = as[i];
+      if (a.getAttribute("data-sc") === "1") continue;
+      var h = a.getAttribute("href");
+      var nh = withCode(h);
+      if (nh && nh !== h) a.setAttribute("href", nh);
+      a.setAttribute("data-sc", "1");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fix);
+  } else {
+    fix();
+  }
+  // 动态插入的链接（如右侧预览里的图片/链接）再补两次
+  setTimeout(fix, 400);
+  setTimeout(fix, 1500);
+})();
+</script>
+</body>
+</html>

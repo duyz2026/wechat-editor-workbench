@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公众号编辑工作台 · 在线演示</title>
+<style>
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+       background:#f4f6f8; color:#1f2329; line-height:1.7; }
+.wrap { max-width:940px; margin:0 auto; padding:0 20px 60px; }
+
+header { background:#fff; border-bottom:1px solid #e6e9ee; padding:26px 20px 22px; }
+header .inner { max-width:940px; margin:0 auto; }
+header h1 { font-size:24px; margin:0 0 8px; letter-spacing:.5px; }
+header .lead { font-size:14px; color:#6b737d; margin:0; }
+.badge { display:inline-block; font-size:11.5px; color:#0a7d4b; background:#f0fff5;
+         border:1px solid #b7e4c7; border-radius:20px; padding:3px 11px; margin-bottom:10px; }
+
+h2.sec { font-size:15px; margin:30px 0 12px; color:#3f4750; display:flex; align-items:center; gap:8px; }
+h2.sec .n { font-size:11px; font-weight:700; color:#3a7afe; background:#eef3ff;
+            border:1px solid #d8e4ff; border-radius:5px; padding:1px 7px; }
+
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+.step { background:#fff; border:1px solid #e6e9ee; border-radius:12px; padding:14px 16px; }
+.step .k { font-size:12px; color:#3a7afe; font-weight:700; margin-bottom:4px; }
+.step .t { font-size:14px; margin:0 0 4px; }
+.step .d { font-size:12.5px; color:#8a9099; margin:0; }
+
+.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+a.card { display:block; padding:16px 18px; background:#fff; border:1px solid #e6e9ee;
+         border-radius:12px; text-decoration:none; color:inherit;
+         transition:box-shadow .15s, transform .15s, border-color .15s; }
+a.card:hover { box-shadow:0 6px 18px rgba(31,35,41,.10); transform:translateY(-1px); border-color:#cfd8e3; }
+a.card .tag { font-size:11px; color:#8a9099; border:1px solid #e6e9ee; border-radius:4px;
+              padding:1px 7px; background:#fafbfc; }
+a.card .t { font-size:15px; font-weight:600; margin:8px 0 6px; }
+a.card .d { font-size:12.5px; color:#8a9099; margin:0; }
+a.card.new { border-style:dashed; background:#fcfdff; }
+
+.note { margin-top:26px; padding:14px 16px; background:#fffdf5; border:1px solid #f2e4bd;
+        border-radius:10px; font-size:13px; color:#7a6420; }
+.note b { color:#5c4a10; }
+.note ul { margin:8px 0 0; padding-left:1.3em; }
+.note li { margin:4px 0; }
+
+.faq { margin-top:26px; }
+.faq details { background:#fff; border:1px solid #e6e9ee; border-radius:10px;
+               padding:12px 16px; margin-bottom:10px; }
+.faq summary { cursor:pointer; font-size:14px; font-weight:600; outline:none; }
+.faq p { font-size:13px; color:#5a626b; margin:10px 0 0; }
+
+footer { padding:22px 20px 40px; font-size:12px; color:#a5abb3; text-align:center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <span class="badge">投稿演示版 · 纯前端，无需登录，不联网</span>
+    <h1>公众号编辑工作台</h1>
+    <p class="lead">左边改 Markdown，右边直接出公众号效果，改完一键复制，去后台 Ctrl+V —— 排版这件事不用再手工调。</p>
+    <p class="lead" style="margin-top:10px; padding:9px 12px; background:#f7f9ff; border:1px solid #dde5f7; border-radius:8px; color:#4a5568;">
+      这是<b>独立投稿用的演示页</b>，与本机的生产写作台互不相通：这里只放示例稿，
+      你在这里的修改<b>不会</b>动到本机任何真实稿件，本机写作台也不会被影响。
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2 class="sec"><span class="n">用法</span>三步走完一篇</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="k">STEP 1</div>
+      <p class="t">左边改文字</p>
+      <p class="d">Markdown 源码直接编辑，标题、引用、代码块、表格、列表都认。</p>
+    </div>
+    <div class="step">
+      <div class="k">STEP 2</div>
+      <p class="t">顶部挑主题</p>
+      <p class="d">雅致 / 科技蓝 / 文艺绿 / 暗夜，四套排版现场切换。</p>
+    </div>
+    <div class="step">
+      <div class="k">STEP 3</div>
+      <p class="t">复制，去后台粘贴</p>
+      <p class="d">点「复制公众号正文」，回公众号编辑器 Ctrl+V，样式一起带过去。</p>
+    </div>
+  </div>
+
+  <h2 class="sec"><span class="n">试一试</span>两篇示例稿，一篇就是说明书</h2>
+  <div class="cards">
+    <a class="card" href="demo-guide.html">
+      <span class="tag">示例 1 · 说明书 · 可直接改完发布</span>
+      <div class="t">用 Markdown 写公众号：一个页面，三步排版</div>
+      <div class="d">这篇本身就是「工作台怎么用」，也是一份能直接发出去的草稿：改完复制，粘到公众号就行。</div>
+    </a>
+    <a class="card" href="demo-long.html">
+      <span class="tag">示例 2 · 长文 · 科技蓝</span>
+      <div class="t">一篇 Markdown，四种排版</div>
+      <div class="d">偏技术向的长文示例，顺带讲清微信编辑器那两个真实存在的坑。</div>
+    </a>
+    <a class="card new" href="demo-blank.html">
+      <span class="tag">自己试 · 不算文章</span>
+      <div class="t">＋ 新建一篇</div>
+      <div class="d">空白模板。也可以点「📂 打开 .md」读你电脑上的稿子（只读进浏览器，不上传）。</div>
+    </a>
+  </div>
+
+  <div class="note">
+    <b>关于这个演示版</b>
+    <ul>
+      <li>页面里的一切都在<b>你自己的浏览器里</b>跑，不上传、不联网、不需要账号。关掉再打开，改过的内容还会问你要不要恢复。</li>
+      <li>完整版在自己电脑上跑的时候，顶上那个「📥 存公众号草稿箱」按钮会直接把稿子送进公众号后台草稿箱。演示版没接这个服务，点了会说明原因，不会假装成功。</li>
+      <li>「📂 打开 .md」和「💾 存回原稿」是真能用的：打开你电脑上的稿子，改完直接写回同一个文件，全程不经过任何服务器。</li>
+    </ul>
+  </div>
+
+  <div class="faq">
+    <h2 class="sec"><span class="n">说明</span>它解决了什么</h2>
+    <details open>
+      <summary>微信只认内联样式，外部 CSS 会被过滤掉</summary>
+      <p>微信编辑器会过滤 <code>&lt;style&gt;</code> 标签和 <code>class</code>，只保留写在 <code>style=""</code> 里的样式。所以渲染时每一条样式都必须内联进标签，否则粘进去就是打回原形。</p>
+    </details>
+    <details>
+      <summary>粘贴会弹「文字对齐异常」，是因为复制了 DOM</summary>
+      <p>在预览区里鼠标全选再 Ctrl+C，浏览器会把计算后的样式一起带走，其中包含 <code>text-align: start</code>，微信不认。这里的做法是<strong>不复制 DOM</strong>，直接把手写的干净 HTML 写进剪贴板，一个 <code>text-align</code> 都没有。</p>
+    </details>
+    <details>
+      <summary>剪贴板要写 text/html，不能写 text/plain</summary>
+      <p>写纯文本的话，后台显示出来会是一整片 <code>&lt;section style=...&gt;</code> 的标签源码，而不是排版好的正文。</p>
+    </details>
+    <details>
+      <summary>本地图片粘过去一定会裂，这个绕不过</summary>
+      <p>微信只认自家图床。所以复制时所有本地图片统一换成一行红色占位提示「此处插入图片：xxx.png」，去后台对应位置用「图片」按钮补。不假装能自动带过去。</p>
+    </details>
+    <details>
+      <summary>「📥 存草稿箱（需本机版）」为什么在这里点不动</summary>
+      <p>这个按钮要把稿子直接送进<b>公众号后台草稿箱</b>，就必须用<b>你本人的</b>公众号登录态——而每个人登录的是自己的号，一个公开网页替任何人保存都是不合适的。</p>
+      <p>所以在线演示版里它不会假装成功，点一下会告诉你三件事：这个按钮是干什么的、演示版用什么替代（「📋 复制公众号正文」+ 后台 Ctrl+V，效果一样）、装到自己电脑上之后它怎么用。</p>
+      <p><b>换句话说：编辑器主体是通用的，草稿箱这一环是私有的。</b>把这两件事分清楚，比给你一个点了会报错的按钮更有用。</p>
+    </details>
+    <details>
+      <summary>想装到自己电脑上用，怎么拿</summary>
+      <p>这个页面是<b>纯前端、无外部依赖</b>的单文件组：四个 HTML，双击就能跑，断网也能跑，不需要装任何东西、不需要服务器。</p>
+      <p>获取方式见文末说明。拿到后随时可用，改动自动存在你浏览器里，「📂 打开 .md」「💾 存回原稿」直接读写你自己电脑上的文件。</p>
+    </details>
+  </div>
+
+</div>
+
+<footer>
+  公众号编辑工作台 · 在线演示版 · 纯前端单页，可离线运行
+</footer>
+
+<script>
+// ===== 分享链接鉴权透传 =====
+// 发布平台要求 URL 携带 ?sharecode=xxx 才允许访问子页面（否则 403「链接不完整」），
+// 而 HTML 里的相对链接不会自动继承 query 参数，点一下内页就 403。
+// 这里在页面加载后，把当前的 sharecode 补到所有站内链接上。
+(function () {
+  var m = (location.search || "").match(/[?&]sharecode=([^&]+)/);
+  var SC = m ? decodeURIComponent(m[1]) : "";
+  if (!SC) return;
+
+  function withCode(href) {
+    if (!href) return href;
+    if (/^(https?:|mailto:|javascript:|tel:|data:|#)/i.test(href)) return href;
+    if (/[?&]sharecode=/i.test(href)) return href;
+    return href + (href.indexOf("?") >= 0 ? "&" : "?") + "sharecode=" + encodeURIComponent(SC);
+  }
+
+  function fix() {
+    var as = document.getElementsByTagName("a");
+    for (var i = 0; i < as.length; i++) {
+      var a = as[i];
+      if (a.getAttribute("data-sc") === "1") continue;
+      var h = a.getAttribute("href");
+      var nh = withCode(h);
+      if (nh && nh !== h) a.setAttribute("href", nh);
+      a.setAttribute("data-sc", "1");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", fix);
+  } else {
+    fix();
+  }
+  // 动态插入的链接（如右侧预览里的图片/链接）再补两次
+  setTimeout(fix, 400);
+  setTimeout(fix, 1500);
+})();
+</script>
+</body>
+</html>
